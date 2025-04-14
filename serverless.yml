@@ -1,0 +1,21 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: nilpay
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: ecomercev1-serverless
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  
+functions:
+  signup:
+    handler: app/handler.SignUp
+    events:
+      - httpApi:
+          path: /signup
+          method: post
+ 
+
+plugins:
+  - serverless-offline
+
