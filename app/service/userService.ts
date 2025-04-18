@@ -29,7 +29,7 @@ export class UserService{
             phone:input.phone,
             salt:salt
         })
-        return SuccessResponse(data)
+        return SuccessResponse({})
     }
 
     async UserLogin(event:APIGatewayProxyEventV2){
