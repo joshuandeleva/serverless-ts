@@ -5,6 +5,7 @@ import { inject, injectable } from 'tsyringe';
 import { plainToClass } from 'class-transformer';
 import { SignupInput } from 'app/models/dto/SignUp';
 import { AppValidation } from 'app/utility/error';
+import { GetHashedPassword, GetSalt } from 'app/utility/password';
 
 
 
@@ -18,9 +19,17 @@ export class UserService{
         const input = plainToClass(SignupInput , event.body)
         const error = await AppValidation(input)
         if(error) return ErrorResponse(404 , error)
-        
-        await this.userRepository.createAccount()
-        return SuccessResponse(input)
+
+        const salt  = await GetSalt();
+        const hashedpassword = await GetHashedPassword(input.password ,salt) ;
+        const data = await this.userRepository.createAccount({
+            email:input.email,
+            password:hashedpassword,
+            userType:'BUYER',
+            phone:input.phone,
+            salt:salt
+        })
+        return SuccessResponse(data)
     }
 
     async UserLogin(event:APIGatewayProxyEventV2){
