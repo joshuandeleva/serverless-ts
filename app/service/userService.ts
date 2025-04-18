@@ -1,7 +1,11 @@
 import { UserRepository } from '../repository/userRepository'
-import { SuccessResponse } from 'app/utility/response'
+import { ErrorResponse, SuccessResponse } from 'app/utility/response'
 import { APIGatewayProxyEventV2 } from 'aws-lambda'
 import { inject, injectable } from 'tsyringe';
+import { plainToClass } from 'class-transformer';
+import { SignupInput } from 'app/models/dto/SignUp';
+import { AppValidation } from 'app/utility/error';
+
 
 
 @injectable()
@@ -11,10 +15,12 @@ export class UserService{
     // user creation
 
     async CreateUser(event:APIGatewayProxyEventV2){
-        const body  = event.body
-        console.log(body)
+        const input = plainToClass(SignupInput , event.body)
+        const error = AppValidation(input)
+        if(error) return ErrorResponse(404 , error)
+        
         await this.userRepository.CreateUserOperation()
-        return SuccessResponse({message:'response from create user'})
+        return SuccessResponse(input)
     }
 
     async UserLogin(event:APIGatewayProxyEventV2){
@@ -25,7 +31,7 @@ export class UserService{
         return SuccessResponse({message:'response from verify user'})
     }
 
-
+ 
     //user profile
 
     async CreateProfile(event:APIGatewayProxyEventV2){

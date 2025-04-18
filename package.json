@@ -5,13 +5,16 @@
   "main": "handler.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec serverless offline"
+    "dev": "nodemon --exec serverless offline",
+    "deploy": "sls deploy --verbose"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.149",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "serverless-offline": "^14.4.0",
     "serverless-plugin-typescript": "^2.1.5",
     "ts-node": "^10.9.2",

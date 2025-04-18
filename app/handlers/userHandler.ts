@@ -11,6 +11,7 @@ container.register('UserRepository', { useClass: UserRepository });
 
 
 // container.register('UserService', { useClass: UserService }); => its already register since we use @inject decorator
+// middy parses json requests from body
 const service = container.resolve(UserService)
 
 export const SignUp = middy((event: APIGatewayProxyEventV2) => {
