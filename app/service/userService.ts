@@ -16,10 +16,10 @@ export class UserService{
 
     async CreateUser(event:APIGatewayProxyEventV2){
         const input = plainToClass(SignupInput , event.body)
-        const error = AppValidation(input)
+        const error = await AppValidation(input)
         if(error) return ErrorResponse(404 , error)
         
-        await this.userRepository.CreateUserOperation()
+        await this.userRepository.createAccount()
         return SuccessResponse(input)
     }
 
