@@ -1,5 +1,5 @@
 import { UserRepository } from '../repository/userRepository'
-import { ErrorResponse, SuccessResponse } from 'app/utility/response'
+import { SuccessResponse } from 'app/utility/response'
 import { APIGatewayProxyEventV2 } from 'aws-lambda'
 import { inject, injectable } from 'tsyringe';
 

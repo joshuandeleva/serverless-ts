@@ -4,7 +4,13 @@ import { APIGatewayProxyEventV2 } from 'aws-lambda'
 import middy from '@middy/core'
 import bodyParser from '@middy/http-json-body-parser'
 import { container } from 'tsyringe'
+import { UserRepository } from 'app/repository/userRepository'
 
+// register repository
+container.register('UserRepository', { useClass: UserRepository });
+
+
+// container.register('UserService', { useClass: UserService }); => its already register since we use @inject decorator
 const service = container.resolve(UserService)
 
 export const SignUp = middy((event: APIGatewayProxyEventV2) => {
