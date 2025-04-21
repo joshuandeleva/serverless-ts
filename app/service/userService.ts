@@ -5,7 +5,8 @@ import { inject, injectable } from 'tsyringe';
 import { plainToClass } from 'class-transformer';
 import { SignupInput } from 'app/models/dto/SignUp';
 import { AppValidation } from 'app/utility/error';
-import { GetHashedPassword, GetSalt } from 'app/utility/password';
+import { GetHashedPassword, GetSalt, getToken, ValidatePassword } from 'app/utility/password';
+import { LoginInput } from 'app/models/dto/Login';
 
 
 
@@ -41,7 +42,23 @@ export class UserService{
     }
 
     async UserLogin(event:APIGatewayProxyEventV2){
-        return SuccessResponse({message:'response from login user'})
+        try {
+            const input = plainToClass(LoginInput, event.body)
+            const error = await AppValidation(input)
+            if (error) return ErrorResponse(404, error)
+
+            const data = await this.userRepository.findAccount(input.email)
+            const verified  = await ValidatePassword(input.password ,data.password, data.salt)
+            if(!verified){
+                throw new Error('Password does not match')
+            }
+            // generate jwt
+            const token = getToken(data)
+            return SuccessResponse({token:token});
+        } catch(e) {
+            console.log(e , 'error occured when creating user')
+            return ErrorResponse(500 , e)
+        }
     }
 
     async VerifyUser(event:APIGatewayProxyEventV2){
