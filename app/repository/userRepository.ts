@@ -17,14 +17,22 @@ export class UserRepository extends DBOperation {
     }
 
     async findAccount(email: string) {
-         const queryString = "SELECT user_id, email , password , phone , salt  FROM users WHERE email=$1"
+         const queryString = "SELECT user_id, email , password , phone , salt,verification_code , expiry  FROM users WHERE email=$1"
          const values = [email]
          const result = await this.executeQuery(queryString ,values)
          if(result?.rowCount === null || result.rowCount < 1){
              throw new Error("User does not exist with provided email id")
          }
          return result.rows[0] as UserModel
+    }
 
+    async updateVerificationCode(userId: string, code:number , expiry:Date ) {
+        const queryString = "UPDATE users SET verification_code=$1 ,expiry=$2 WHERE user_id=$3  RETURNING *"
+        const values = [code , expiry , userId]
+        const result = await this.executeQuery(queryString, values)
+        if (result.rowCount !== null && result.rowCount > 0) {
+            return result.rows[0] as UserModel;
+        }
     }
 }
 

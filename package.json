@@ -29,6 +29,7 @@
     "@types/bcryptjs": "^3.0.0",
     "aws-lambda": "^1.0.7",
     "bcryptjs": "^3.0.2",
+    "datejs": "^1.0.0-rc3",
     "db-migrate": "^0.11.14",
     "db-migrate-pg": "^1.5.2",
     "jsonwebtoken": "^9.0.2",

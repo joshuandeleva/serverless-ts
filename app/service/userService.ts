@@ -8,6 +8,7 @@ import { AppValidation } from 'app/utility/error';
 import { GetHashedPassword, GetSalt, getToken, ValidatePassword, verifyToken } from 'app/utility/password';
 import { LoginInput } from 'app/models/dto/Login';
 import { generateAccessCode, sendVerificationCode } from 'app/utility/notification';
+import { VerficationInput } from 'app/models/dto/UpdatedCode';
 
 
 
@@ -63,7 +64,35 @@ export class UserService{
     }
 
     async VerifyUser(event:APIGatewayProxyEventV2){
-        return SuccessResponse({message:'response from verify user'})
+        const token = event.headers.authorization
+        if(token === "" || !token){
+            throw new Error("No token provided")
+        }
+        const payload = await verifyToken(token)
+
+        if (!payload) return ErrorResponse(403, 'Authorization failed')
+        
+        const input = plainToClass(VerficationInput, event.body)
+        const error = await AppValidation(input)
+        if (error) return ErrorResponse(404, error)
+
+        // find user account
+        const {verification_code , expiry} = await this.userRepository.findAccount(payload.email)
+
+        if(verification_code === parseFloat(input.code)){
+            // check timestamp
+            const currentTime = new Date()
+
+            
+
+            // update to db
+        }
+
+
+        // check the code is same or not and time should be within expiry time
+
+
+        return SuccessResponse({message:'User verified'})
     }
 
     async getVerificationToken(event:APIGatewayProxyEventV2){
@@ -74,14 +103,16 @@ export class UserService{
             }
             const payload = await verifyToken(token)
 
-            if(payload){
-                const {code,expiry} = generateAccessCode()
+            if (!payload) return ErrorResponse(403, 'Authorization failed')
+            const { code, expiry } = generateAccessCode()
 
-                // save on DB to confirm verification
-                const response = await sendVerificationCode(code , payload.phone)
-                return SuccessResponse({message:`Verification code is sent to ${payload.phone}`})
+            // save on DB to confirm verification
+            if (!payload.user_id) {
+                throw new Error("User ID is undefined");
             }
-
+            await this.userRepository.updateVerificationCode(payload.user_id, Number(code), expiry);
+            //const response = await sendVerificationCode(code , payload.phone)
+            return SuccessResponse({ message: `Verification code is sent to ${payload.phone}` })
         }catch(e){
             return ErrorResponse(500 , e)
         }
