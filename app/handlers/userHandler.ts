@@ -24,8 +24,15 @@ export const Login = middy ((event: APIGatewayProxyEventV2) => {
 }).use(bodyParser())
 
 export const Verify = async (event: APIGatewayProxyEventV2) => {
-    return service.VerifyUser(event)
-
+    const httpMethod = event.requestContext.http.method.toLowerCase()
+    switch(httpMethod){
+        case "post":
+            return service.VerifyUser(event)
+        case "get":
+            return service.getVerificationToken(event)
+        default:
+            return ErrorResponse(404 , "requested method is not supported")
+    }
 }
 export const Profile = async (event: APIGatewayProxyEventV2) => {
     const httpMethod = event.requestContext.http.method.toLowerCase()

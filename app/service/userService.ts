@@ -5,8 +5,9 @@ import { inject, injectable } from 'tsyringe';
 import { plainToClass } from 'class-transformer';
 import { SignupInput } from 'app/models/dto/SignUp';
 import { AppValidation } from 'app/utility/error';
-import { GetHashedPassword, GetSalt, getToken, ValidatePassword } from 'app/utility/password';
+import { GetHashedPassword, GetSalt, getToken, ValidatePassword, verifyToken } from 'app/utility/password';
 import { LoginInput } from 'app/models/dto/Login';
+import { generateAccessCode, sendVerificationCode } from 'app/utility/notification';
 
 
 
@@ -63,6 +64,28 @@ export class UserService{
 
     async VerifyUser(event:APIGatewayProxyEventV2){
         return SuccessResponse({message:'response from verify user'})
+    }
+
+    async getVerificationToken(event:APIGatewayProxyEventV2){
+        try{
+            const token = event.headers.authorization
+            if(token === "" || !token){
+                throw new Error("No token provided")
+            }
+            const payload = await verifyToken(token)
+
+            if(payload){
+                const {code,expiry} = generateAccessCode()
+
+                // save on DB to confirm verification
+                const response = await sendVerificationCode(code , payload.phone)
+                return SuccessResponse({message:`Verification code is sent to ${payload.phone}`})
+            }
+
+        }catch(e){
+            return ErrorResponse(500 , e)
+        }
+       
     }
 
  
