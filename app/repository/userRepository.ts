@@ -99,10 +99,10 @@ export class UserRepository extends DBOperation {
         
     }
 
-    async editProfile(user_id: number, { firstName, lastName, userType, address: { addressLine1, addressLine2, city, country, postCode } }: ProfileInput) {
+    async editProfile(user_id: number, { firstName, lastName, userType, address: { addressLine1, addressLine2, city, country, postCode , id } }: ProfileInput) {
         await this.updateUser(user_id, firstName, lastName, userType)
         const queryString = "UPDATE address SET  address_line1=$1 , address_line2=$2 , city=$3 , country=$4 , post_code=$5 WHERE id=$6 RETURNING *"
-        const values = [addressLine1, addressLine2, city, country, postCode, user_id]
+        const values = [addressLine1, addressLine2, city, country, postCode, id]
         const result = await this.executeQuery(queryString, values)
 
         if (result.rowCount !== null && result.rowCount < 1) {
