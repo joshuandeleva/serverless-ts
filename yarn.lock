@@ -848,6 +848,13 @@
   resolved "https://registry.yarnpkg.com/@middy/core/-/core-6.1.6.tgz#c7773881cbd1869dc50d7a0bce3718e37a5573a7"
   integrity sha512-YT7J0+9zgGIhKnC6lA5z1iE+EDHpmMda7H7gD59cu4inxRC2RTk+ensGFaJxXXMlAM08vGJn6Q5gH8KnV6YWoQ==
 
+"@middy/http-error-handler@^6.1.6":
+  version "6.1.6"
+  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-6.1.6.tgz#354c88d9d98fa999fd43ba53494883e76dcc124b"
+  integrity sha512-E3RBoAryPZ0zBl0stptJLPsC0qSSniYpsCEE+ELqVBh/Ew93WnRQZUpa4wz/Og7bexY8brrLrPGp5a6r89S6rQ==
+  dependencies:
+    "@middy/util" "6.1.6"
+
 "@middy/http-json-body-parser@^6.1.6":
   version "6.1.6"
   resolved "https://registry.yarnpkg.com/@middy/http-json-body-parser/-/http-json-body-parser-6.1.6.tgz#bc16aa9e1f31c01623950161ca045bb0576bef45"

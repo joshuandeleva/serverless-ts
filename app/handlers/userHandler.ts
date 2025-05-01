@@ -5,6 +5,7 @@ import middy from '@middy/core'
 import bodyParser from '@middy/http-json-body-parser'
 import { container } from 'tsyringe'
 import { UserRepository } from 'app/repository/userRepository'
+import { conditionalBodyParser } from 'app/utility/requestMiddleware'
 
 // register repository
 container.register('UserRepository', { useClass: UserRepository });
@@ -23,18 +24,17 @@ export const Login = middy ((event: APIGatewayProxyEventV2) => {
     return service.UserLogin(event)
 }).use(bodyParser())
 
-export const Verify = async (event: APIGatewayProxyEventV2) => {
-    const httpMethod = event.requestContext.http.method.toLowerCase()
-    switch(httpMethod){
-        case "post":
-            return service.VerifyUser(event)
-        case "get":
-            return service.getVerificationToken(event)
-        default:
-            return ErrorResponse(404 , "requested method is not supported")
+export const Verify = middy((event: APIGatewayProxyEventV2) => {
+    const httpMethod = event.requestContext.http.method.toLowerCase();
+    if(httpMethod === "post"){
+        return  service.VerifyUser(event);
+    }else if(httpMethod === "get"){
+        return service.getVerificationToken(event);
+    }else{
+        return service.ResponseWithError(event);
     }
-}
-export const Profile = async (event: APIGatewayProxyEventV2) => {
+}).use(conditionalBodyParser())
+export const Profile = middy ((event: APIGatewayProxyEventV2) => {
     const httpMethod = event.requestContext.http.method.toLowerCase()
     switch(httpMethod){
         case "post":
@@ -46,9 +46,9 @@ export const Profile = async (event: APIGatewayProxyEventV2) => {
         default:
             return ErrorResponse(404 , "requested method is not supported")
     }
-}
+}).use(conditionalBodyParser())
 
-export const Cart = async (event: APIGatewayProxyEventV2) => {
+export const Cart = middy((event: APIGatewayProxyEventV2) => {
     const httpMethod = event.requestContext.http.method.toLowerCase()
     switch(httpMethod){
         case "post":
@@ -60,9 +60,9 @@ export const Cart = async (event: APIGatewayProxyEventV2) => {
         default:
             return ErrorResponse(404 , "requested method is not supported")
     }
-}
+}).use(conditionalBodyParser())
 
-export const Payment = async (event: APIGatewayProxyEventV2) => {
+export const Payment = middy ((event: APIGatewayProxyEventV2) => {
     const httpMethod = event.requestContext.http.method.toLowerCase()
     switch(httpMethod){
         case "post":
@@ -74,4 +74,4 @@ export const Payment = async (event: APIGatewayProxyEventV2) => {
         default:
             return ErrorResponse(404 , "requested method is not supported")
     }
-}
+}).use(conditionalBodyParser())

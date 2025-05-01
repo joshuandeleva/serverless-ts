@@ -27,12 +27,25 @@ export class UserRepository extends DBOperation {
     }
 
     async updateVerificationCode(userId: string, code:number , expiry:Date ) {
-        const queryString = "UPDATE users SET verification_code=$1 ,expiry=$2 WHERE user_id=$3  RETURNING *"
+        const queryString = "UPDATE users SET verification_code=$1 ,expiry=$2 WHERE user_id=$3 AND verified=FALSE  RETURNING *"
         const values = [code , expiry , userId]
         const result = await this.executeQuery(queryString, values)
         if (result.rowCount !== null && result.rowCount > 0) {
             return result.rows[0] as UserModel;
+        }else{
+            throw new Error("user already verified")
         }
     }
+    async updateVerifyUser(userId: string) {
+        const queryString = "UPDATE users SET verified=TRUE  WHERE user_id=$1 AND verified=FALSE  RETURNING *"
+        const values = [userId]
+        const result = await this.executeQuery(queryString, values)
+        if (result.rowCount !== null && result.rowCount > 0) {
+            return result.rows[0] as UserModel;
+        }else{
+            throw new Error("user already verified")
+        }
+    }
+    
 }
 

@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@middy/http-error-handler": "^6.1.6",
     "@types/aws-lambda": "^8.10.149",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/pg": "^8.11.13",
