@@ -1,8 +1,7 @@
 import twilio from 'twilio'
-const accountSid = 'ACbda26149cf56c03be9f2aa28f8bca511';
-const authToken = 'c32c56419382fdf1736bc89873743886'
+const accountSid = process.env.TWILIO_ACCOUNT_SID
+const authToken = process.env.TWILIO_AUTH_TOKEN
 const client = twilio(accountSid, authToken)
-// atsk_a2fae89dc250ebfcc150ea046c0f03490891cbe270856c20f3d7e386f3fac18d7174cd0c
 
 
 export const generateAccessCode = () => {

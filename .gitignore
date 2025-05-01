@@ -1,2 +1,8 @@
 node_modules
 .serverless
+.env
+coverage
+*.log
+*.tsbuildinfo
+*.tgz
+*.zip
