@@ -10,6 +10,7 @@ import { LoginInput } from 'app/models/dto/Login';
 import { generateAccessCode, sendVerificationCode } from 'app/utility/notification';
 import { VerficationInput } from 'app/models/dto/UpdatedCode';
 import { TimeDifference } from 'app/utility/dateHelper';
+import { ProfileInput } from 'app/models/dto/AddressInput';
 
 
 
@@ -104,12 +105,12 @@ export class UserService {
                 } else {
                     return ErrorResponse(400, 'Verification code already expired')
                 }
-            }else {
-                return ErrorResponse(400, 'Invalid verification code'); 
+            } else {
+                return ErrorResponse(400, 'Invalid verification code');
             }
 
         } catch (error) {
-            console.log(error , 'middy error');
+            console.log(error, 'middy error');
             return ErrorResponse(500, error)
         }
     }
@@ -142,15 +143,90 @@ export class UserService {
     //user profile
 
     async CreateProfile(event: APIGatewayProxyEventV2) {
-        return SuccessResponse({ message: 'response from create user profile' })
+        try {
+            const token = event.headers.authorization
+            if (token === "" || !token) return ErrorResponse(401, 'No token provided')
+
+            // verify token
+
+            const payload = await verifyToken(token)
+            if (!payload) return ErrorResponse(403, 'Authorization Failed')
+
+            // validate user input
+
+            const input = plainToClass(ProfileInput, event.body)
+            const error = await AppValidation(input)
+            if (error) return ErrorResponse(404, error)
+
+            // db operation
+
+            if (!payload.user_id) return ErrorResponse(400, 'User ID is undefined')
+
+            const result = await this.userRepository.createProfile(payload.user_id, input)
+            console.log(result, 'result from db')
+
+            // send notification if there is a result
+
+
+            return SuccessResponse({ message: 'User profile created successfully' })
+
+        } catch (e) {
+            console.log(e, 'error occured when creating user profile')
+            return ErrorResponse(500, e)
+        }
     }
 
     async EditProfile(event: APIGatewayProxyEventV2) {
-        return SuccessResponse({ message: 'response from update user profile' })
+        try {
+            const token = event.headers.authorization
+            if (token === "" || !token) return ErrorResponse(401, 'No token provided')
+
+            // verify token
+
+            const payload = await verifyToken(token)
+            if (!payload) return ErrorResponse(403, 'Authorization Failed')
+
+            // validate user input
+
+            const input = plainToClass(ProfileInput, event.body)
+            const error = await AppValidation(input)
+            if (error) return ErrorResponse(404, error)
+
+            // db operation
+
+            if (!payload.user_id) return ErrorResponse(400, 'User ID is undefined')
+            const result = await this.userRepository.editProfile(payload.user_id , input)
+            console.log(result, 'result from db when updating user profile')
+            // send notification if there is a result
+
+            if (!result) return ErrorResponse(404, 'User profile not found')
+            return SuccessResponse({ message: 'User profile updated successfully' })
+        } catch (e) {
+            console.log(e, 'Error occured when updating user profile')
+            return ErrorResponse(500, e)
+        }
     }
 
     async GetProfile(event: APIGatewayProxyEventV2) {
-        return SuccessResponse({ message: 'response from get user profile' })
+        try {
+            const token = event.headers.authorization
+            if (token === "" || !token) return ErrorResponse(401, 'No token provided')
+
+            // verify token
+
+            const payload = await verifyToken(token)
+            if (!payload) return ErrorResponse(403, 'Authorization Failed')
+            
+            // db operation
+            if (!payload.user_id) return ErrorResponse(400, 'User ID is undefined')
+            const result = await this.userRepository.getUserProfile(payload.user_id)
+
+            if (!result) return ErrorResponse(404, 'User profile not found')
+            return SuccessResponse(result)
+        } catch (e) {
+            console.log(e, 'Error occured when getting user profile')
+            return ErrorResponse(500, e)
+        }
     }
 
 

@@ -1,5 +1,7 @@
+import { AddressModel } from "./AddressModel";
+
 export interface UserModel {
-    user_id?: string;
+    user_id?: number;
     email: string;
     password:string;
     salt:string;
@@ -11,4 +13,5 @@ export interface UserModel {
     verification_code?:number,
     expiry?:Date,
     verified?:boolean,
+    address?: AddressModel[];
 }
